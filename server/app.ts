@@ -6,7 +6,7 @@ import mongoose, {Connection } from 'mongoose';
 import dotenv from "dotenv";////loads environment variables from a .env file into process.env at the sametime hides the secret contents from users and remote devs?
 import cors, {CorsOptions} from "cors";
 import { Request, Response } from "express";
-
+import userRouter from "./src/routes/userRoute";
 //2. create Express application instance
 //Note for myself ts require type definition here we have Express, but what express() means
 //Ans: express() = function
@@ -39,7 +39,7 @@ app.use(express.json());//app can read JSON data sent from the client
 app.use(express.urlencoded({extended: false}));// parse URL-encoded form data, making it accessible as a JavaScript object in req.body//extended = Allows parsing of nested objects and arrays using the qs library.
 app.use(morgan("dev"));//dev logs
 //6. Routers
-
+app.use("/api/user",userRouter)
 //7. setting corse options => By default CORS block proxying cross origin sources through scripts
 //console.log("NODE_ENV =", process.env.NODE_ENV);
 /*Now, if we run NODE_ENV=development npm run dev:server (or Windows users SET NODE_ENV=development& npm run dev:server), the server allows requests from http://localhost:3000.*/

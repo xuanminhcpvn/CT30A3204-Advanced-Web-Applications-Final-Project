@@ -5,11 +5,7 @@ export interface CustomRequest extends Request {
   user?: JwtPayload;
 }
 
-export const validateToken = (
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-) => {
+export const validateToken = (req: CustomRequest,res: Response,next: NextFunction) => {
   const token: string | undefined = req.header("authorization")?.split(" ")[1];
 
   if (!token)

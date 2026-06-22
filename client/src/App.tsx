@@ -6,6 +6,7 @@ import Register from "./components/Register";
 import Navigation from './components/Navigation'
 import DocumentView from './components/DocumentView';
 import DocumentEdit from './components/DocumentEdit';
+import DocumentPublic from './components/DocumentPublic';
 function App() {
   return (
     <BrowserRouter>
@@ -16,8 +17,9 @@ function App() {
 
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/document/edit/:fileId" element={<DocumentEdit />} />
+          <Route path="/document/edit/:driveFileId" element={<DocumentEdit />} />
           <Route path="/document/view/:fileId" element={<DocumentView />} />
+          <Route path="/document/public/:driveFileId" element={<DocumentPublic />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
         </Routes>

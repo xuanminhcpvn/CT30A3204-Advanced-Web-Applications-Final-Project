@@ -138,7 +138,6 @@ router.put("/:id",validateToken, async (req: CustomRequest, res:Response) => {
         if (userId) {driveFile.currentlyUsedBy = new Types.ObjectId(userId);}
 
         await driveFile.save();
-
         return res.status(200).json(driveFile);
         
     } catch (err) {
@@ -217,7 +216,7 @@ router.post("/:id/viewer", validateToken, async (req: CustomRequest, res: Respon
 });
 
 //Create public link
-router.post("/:id/share/view", validateToken, async (req: CustomRequest, res: Response) => {
+router.post("/public/:shareLink", validateToken, async (req: CustomRequest, res: Response) => {
   const driveFileId = req.params.id as string;
   const userId: string | undefined = req.user?.userId;
 
@@ -232,19 +231,16 @@ router.post("/:id/share/view", validateToken, async (req: CustomRequest, res: Re
       return res.status(403).json({ message: "Only owner can create link" });
     }
 
-    const shareLink: string = new Types.ObjectId().toString();
-
     driveFile.isPublic = true;
-    driveFile.shareLink = shareLink;
+    driveFile.shareLink = driveFileId; //for simplicity the shareLink is just the file id
     await driveFile.save();
-    return res.status(200).json({shareUrl: `${process.env.FRONTEND_URL}/shared/${shareLink}`});
-
+    return res.status(200);
   } catch {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 //Get public link
-router.get("/shared/:shareLink", async (req, res) => {
+router.get("/public/:shareLink", async (req, res) => {
   const shareLink: string = req.params.shareLink;
 
   try {
@@ -277,15 +273,14 @@ router.patch("/:id/visibility", validateToken, async (req: CustomRequest, res: R
             return res.status(403).json({ message: "Only owner can change visibility" });
         }
 
-        driveFile.isPublic = isPublic;
-
-        // if turning off public → optionally clear link
-        if (!isPublic) {
-            driveFile.shareLink = null; 
-        } else if (!driveFile.shareLink) {
-            driveFile.shareLink = new Types.ObjectId().toString();
+        
+        //for simplicity => shareLink is just the file link => since the route only accessible if the file is public
+        driveFile.isPublic = isPublic;//Update visibility before link existence check
+        if (driveFile.isPublic) {
+          driveFile.shareLink = driveFile._id.toString();
+        } else {
+          driveFile.shareLink = null;
         }
-
         await driveFile.save();
         return res.status(200).json(driveFile);
 

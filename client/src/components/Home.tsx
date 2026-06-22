@@ -30,7 +30,6 @@ const Home = () => {
             fetchMe();
         }
     }, [jwt])
-    console.log(user);
     
     // GET files
     const fetchFiles = async () => {
@@ -121,7 +120,7 @@ const Home = () => {
 
     const permanentDelete = async (id: string) => {
         try {
-            const res = await fetch(`/api/files/${id}/permanent`, {
+            const res = await fetch(`/api/files/${id}/permanent-delete`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${jwt}`
@@ -256,7 +255,7 @@ const Home = () => {
             return;
         }
 
-        const link = `${window.location.origin}/document/shared/${driveFile.shareLink}`;
+        const link = `${window.location.origin}/document/public/${driveFile.shareLink}`;
         navigator.clipboard.writeText(link);
         alert("Link copied!");
     };
@@ -302,7 +301,7 @@ const Home = () => {
                                     <button onClick={() => navigate(`/document/edit/${file._id}`)}>Edit</button>
                                     <button onClick={() => navigate(`/document/view/${file._id}`)}>View</button>
                                     <button onClick={() => handleRename(file._id)}>Rename</button>
-                                    <button data-testid="cypress-soft-delete-btn" onClick={() => softDelete(file._id)}>Delete</button>
+                                    {!isOwner && (<button data-testid="cypress-soft-delete-btn" onClick={() => softDelete(file._id)}>Delete</button>)}
                                     {isOwner && (
                                         <>
                                             <button onClick={() => handleShare(file._id, "edit")}>Share Edit</button>

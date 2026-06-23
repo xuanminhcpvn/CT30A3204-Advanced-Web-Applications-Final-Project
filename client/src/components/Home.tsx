@@ -24,9 +24,10 @@ const Home = () => {
     const [files, setFiles] = useState<IDriveFile[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [user, setUser] = useState<IUser | null>(null);
-
+    //Additional features: sort, search
     const [sortBy, setSortBy] = useState<string>("name");
-    
+    const [searchTerm, setSearchTerm] = useState<string>("");
+
     const navigate = useNavigate();
     //Updated state control to set jtw token once and fetch everything else when jwt is set or refreshed
     useEffect(() => {
@@ -267,6 +268,7 @@ const Home = () => {
         return `${day}.${month}.${year}`;
     };
 
+    //Sort first => then search
     const sortedFiles: IDriveFile[] = [...files].sort((a: IDriveFile, b: IDriveFile): number => {
         //Note
         if (sortBy === "name") {
@@ -284,6 +286,13 @@ const Home = () => {
         return 0;
     }
     );
+    //Filter the sortedFile => start with certain character
+    //Dev notes: Reference to the searchbar feature: https://stackoverflow.com/questions/79003763/i-have-tried-to-implement-search-functionality-in-react-when-i-clear-the-input
+    //Though in that example they use a separate component => but filter is good way to render search result live
+    const visibleFiles: IDriveFile[] = sortedFiles.filter(
+        (file: IDriveFile): boolean =>
+            file.filename.toLowerCase().startsWith(searchTerm.toLowerCase())
+    );
     //basic UI (see previous git commit) is done by me
     //I used chatGPT to refine UI
     return (
@@ -297,6 +306,8 @@ const Home = () => {
                     <div style={{ marginBottom: "20px" }}>
                         <button onClick={createFile} style={{ marginRight: "10px" }}>New File</button>
                         <button onClick={fetchFiles}>Refresh</button>
+                        {/* Search bar */}
+                        <input type="text" placeholder="Search documents..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
                         {/* Sort dropdown*/}
                         <label>Sort By: </label>
                         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
@@ -306,7 +317,7 @@ const Home = () => {
                         </select>
                     </div>
                     {loading && <p>Loading...</p>}
-                    {sortedFiles.map((file) => {
+                    {visibleFiles.map((file) => {
                         const isOwner: boolean = user?._id === file.ownerId;
                         return (
                             <div

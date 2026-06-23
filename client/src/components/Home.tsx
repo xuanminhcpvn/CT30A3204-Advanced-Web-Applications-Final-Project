@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import authInterceptor from "../interceptors/authInterceptor";
 interface IDriveFile {
     _id: string;
     ownerId: string
@@ -23,7 +23,6 @@ interface IUser {
 }
 
 const Home = () => {
-    const [jwt, setJwt] = useState<string | null>(null);
     const [files, setFiles] = useState<IDriveFile[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [user, setUser] = useState<IUser | null>(null);
@@ -41,29 +40,19 @@ const Home = () => {
     const navigate = useNavigate();
     //Updated state control to set jtw token once and fetch everything else when jwt is set or refreshed
     const imageUploadInputId: string = "drive-image-upload";
+    // authInterceptor now handles access token and refresh token automatically
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            setJwt(token);
-        }
-    }, []);
-
-    useEffect(() => {
-        if (!jwt){
-            return;
-        }
         fetchMe();
         fetchFiles();
-    }, [jwt]);
+    }, []);
     // GET files
     const fetchFiles = async () => {
         setLoading(true);
         try {
-            const res = await fetch("/api/files", {
+            const res = await authInterceptor("/api/files", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${jwt}`
                 } 
             })
 
@@ -93,11 +82,10 @@ const Home = () => {
             return;
         }
         try {
-            const res = await fetch("/api/files", {
+            const res = await authInterceptor("/api/files", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${jwt}`
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     filename: enteredFileName.trim(), // use user input
@@ -118,10 +106,10 @@ const Home = () => {
 
     const softDelete = async (id: string) => {
         try {
-            const res = await fetch(`/api/files/${id}/soft-delete`, {
+            const res = await authInterceptor(`/api/files/${id}/soft-delete`, {
                 method: "PATCH",
                 headers: {
-                    "Authorization": `Bearer ${jwt}`
+                    "Content-Type": "application/json"
                 }
             });
 
@@ -137,10 +125,10 @@ const Home = () => {
 
     const permanentDelete = async (id: string) => {
         try {
-            const res = await fetch(`/api/files/${id}/permanent-delete`, {
+            const res = await authInterceptor(`/api/files/${id}/permanent-delete`, {
                 method: "DELETE",
                 headers: {
-                    "Authorization": `Bearer ${jwt}`
+                    "Content-Type": "application/json"
                 }
             });
             if (!res.ok) {
@@ -161,11 +149,10 @@ const Home = () => {
         }
 
         try {
-            const res = await fetch(`/api/document/${fileId}`, {
+            const res = await authInterceptor(`/api/document/${fileId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${jwt}`
                 },
                 body: JSON.stringify({
                     filename: newFileName
@@ -188,11 +175,10 @@ const Home = () => {
         }
         try {
             const route: string = shareType === "edit" ? `/api/files/${driveFileId}/editor` : `/api/files/${driveFileId}/viewer`;
-            const res: Response = await fetch(route, {
+            const res: Response = await authInterceptor(route, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${jwt}`
                 },
                 body: JSON.stringify({email: email})
             });
@@ -212,11 +198,10 @@ const Home = () => {
 
     const togglePublic = async (driveFileId: string, currentState: boolean) => {
         try {
-            const res = await fetch(`/api/files/${driveFileId}/visibility`, {
+            const res = await authInterceptor(`/api/files/${driveFileId}/visibility`, {
                 method: "PATCH",
                 headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${jwt}`,
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ isPublic: !currentState }),
             });
@@ -243,9 +228,9 @@ const Home = () => {
 
     const fetchMe = async () => {
         try {
-            const res = await fetch("/api/user/me", {
+            const res = await authInterceptor("/api/user/me", {
                 headers: {
-                    "Authorization": `Bearer ${jwt}`
+                    "Content-Type": "application/json"
                 }
             });
 
@@ -264,6 +249,7 @@ const Home = () => {
             setUser(normalizedUser);
         } catch (err) {
             console.log(err);
+            navigate("/login");
         }
     };
 
@@ -337,11 +323,8 @@ const Home = () => {
         try {
             setUploadingImage(true);
 
-            const res = await fetch("/api/user/profile-image", {
+            const res = await authInterceptor("/api/user/profile-image", {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${jwt}`
-                },
                 body: formData
             });
 
@@ -395,11 +378,8 @@ const Home = () => {
         try {
             setUploadingImage(true);
 
-            const res = await fetch("/api/files/upload-image", {
+            const res = await authInterceptor("/api/files/upload-image", {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${jwt}`
-                },
                 body: formData
             });
 
@@ -420,10 +400,10 @@ const Home = () => {
         try {
             setCloningId(fileId);
 
-            const res = await fetch(`/api/files/${fileId}/clone`, {
+            const res = await authInterceptor(`/api/files/${fileId}/clone`, {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${jwt}`
+                    "Content-Type": "application/json"
                 }
             });
 
@@ -499,9 +479,6 @@ const Home = () => {
             </div>
             </div>
             )}
-            {!jwt ? (
-                <p>Please login to fetch the files.</p>
-            ) : (
                 <>
                     {/* Top buttons */}
                     <div style={{ marginBottom: "20px" }}>
@@ -575,8 +552,7 @@ const Home = () => {
                     {files.length === 0 && !loading && (
                         <p>No files found</p>
                     )}
-                </>
-            )}
+                </> 
         </div>
     );
 };

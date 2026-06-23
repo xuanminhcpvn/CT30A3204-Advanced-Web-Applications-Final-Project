@@ -7,7 +7,7 @@ import Navigation from './components/Navigation'
 import DocumentView from './components/DocumentView';
 import DocumentEdit from './components/DocumentEdit';
 import DocumentPublic from './components/DocumentPublic';
-function App() {
+function App() { 
   return (
     <BrowserRouter>
       <Navigation />

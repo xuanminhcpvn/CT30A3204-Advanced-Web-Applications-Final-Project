@@ -94,16 +94,9 @@ router.post("/profile-image", validateToken, upload.single("image"), async (req:
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-
-
         //Deleting old file from the local file system
         if (user.imageId) {
-            const oldPath = path.join(
-                process.cwd(),
-                "uploads",
-                "images",
-                user.imageId
-            );
+            const oldPath = path.join(process.cwd(),"uploads","images",user.imageId);
 
             if (fs.existsSync(oldPath)) {
                 fs.unlinkSync(oldPath);

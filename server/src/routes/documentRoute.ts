@@ -34,6 +34,8 @@ router.get("/:id", validateToken, async (req: CustomRequest, res: Response) => {
             _id: driveFile._id,
             filename: driveFile.filename,
             contents: driveFile.contents,
+            type: driveFile.type,
+            imageUrl: driveFile.imageUrl,
             canEdit: canEdit,
             canView: canView
         });
@@ -62,6 +64,8 @@ router.get("/public/:id", async (req: Request, res: Response) => {
             _id: driveFile._id,
             filename: driveFile.filename,
             contents: driveFile.contents,
+            type: driveFile.type,
+            imageUrl: driveFile.imageUrl,
         });
 
     } catch (error) {

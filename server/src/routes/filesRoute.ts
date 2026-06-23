@@ -3,6 +3,7 @@ import { Response, Router } from "express"
 import { DriveFile, IDriveFile } from "../models/DriveFile";
 import { User, IUser } from "../models/User";
 import mongoose, { Types } from "mongoose";
+import upload from "../middleware/multer-config";
 
 const router: Router = Router();
 /* BASIC CRUD: */
@@ -306,4 +307,24 @@ router.post("/:id/clone", validateToken, async (req: CustomRequest, res: Respons
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+router.post("/upload-image",validateToken,upload.single("image"), async (req: CustomRequest, res: Response): Promise<void> => {
+        try {
+          if (!req.file) {
+            res.status(400).json({error: "Image file is required"});
+            return;
+          }
+          const driveFile: IDriveFile = await DriveFile.create({
+              ownerId: req.user?.userId,
+              filename: req.file.originalname,
+              contents: "image",
+              imageUrl: req.file.filename,
+              type: "image"
+          });
+          res.status(200).json(driveFile);
+        } catch (err) {
+          res.status(500).json({error: "Internal Server Error"});
+        }
+    }
+);
 export default router;

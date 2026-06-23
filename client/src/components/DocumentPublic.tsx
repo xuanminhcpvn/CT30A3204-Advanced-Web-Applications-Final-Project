@@ -46,11 +46,34 @@ const DocumentPublic = () => {
     }
 
     return (
-        <div style={{ padding: "20px" }}>
-            <h2>{document.filename}</h2>
-            <ReactQuill value={document.contents} readOnly={true} theme="snow" modules={modules}/>
-        </div>
-    );
+                <div style={{ padding: "20px" }}>
+                    <h2>{document?.filename}</h2>
+                    {document ? (
+                    <>
+                    {/* image files can't use Quill */}
+                    {document.type === "image" ? (
+                    <img
+                        src={`http://localhost:1234/uploads/${document.imageUrl}`}
+                        alt={document.filename}
+                        style={{
+                            maxWidth: "100%",
+                            maxHeight: "700px",
+                            objectFit: "contain"
+                    }}/>
+                    ) : (
+                    <ReactQuill
+                        value={document.contents}
+                        readOnly={true}
+                        modules={modules}
+                        theme="snow"
+                    />
+                )}
+            </>
+        ) : (
+            <p>Loading...</p>
+        )}
+                </div>
+            );
 };
 
 export default DocumentPublic;

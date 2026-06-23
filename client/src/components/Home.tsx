@@ -34,9 +34,11 @@ const Home = () => {
     const [cloningId, setCloningId] = useState<string | null>(null);
     //profile upload
     const [uploadingImage, setUploadingImage] = useState<boolean>(false);
+    //Image document upload
+    const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
     const navigate = useNavigate();
     //Updated state control to set jtw token once and fetch everything else when jwt is set or refreshed
-
+    const imageUploadInputId: string = "drive-image-upload";
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
@@ -361,11 +363,50 @@ const Home = () => {
         }
     };
 
-    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file: File | undefined= e.target.files?.[0];
+        if (!file){
+            alert("No file selected");
+            return;
+        }
+        await uploadProfileImage(file);
+    };
+    const handleDriveImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file: File | undefined = e.target.files?.[0];
 
-    uploadProfileImage(file);
+        if (!file) {
+            alert("No file selected");
+            return;
+        }
+
+        await uploadDriveImage(file);
+    };
+    //EDITED: upload Drive image file
+    const uploadDriveImage = async (file: File) => {
+        const formData: FormData = new FormData();
+        formData.append("image", file);
+        try {
+            setUploadingImage(true);
+
+            const res = await fetch("/api/files/upload-image", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${jwt}`
+                },
+                body: formData
+            });
+
+            if (!res.ok) {
+                throw new Error("Failed to upload image");
+            }
+            await fetchFiles();
+            alert("Image uploaded successfully");
+        } catch (err) {
+            console.log(err);
+            alert("Image upload failed");
+        } finally {
+            setUploadingImage(false);
+        }
     };
 
     const handleClone = async (fileId: string) => {
@@ -458,6 +499,8 @@ const Home = () => {
                     {/* Top buttons */}
                     <div style={{ marginBottom: "20px" }}>
                         <button onClick={createFile} style={{ marginRight: "10px" }}>New File</button>
+                        <input id={imageUploadInputId} type="file" accept="image/*" style={{ display: "none" }} onChange={handleDriveImageSelect}/>
+                        <button onClick={() => {const imageInput: HTMLElement | null = document.getElementById(imageUploadInputId); imageInput?.click();}}>Upload Image</button>
                         <button onClick={fetchFiles}>Refresh</button>
                         {/* Search bar */}
                         <input type="text" placeholder="Search documents..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
@@ -494,14 +537,14 @@ const Home = () => {
                                 </div>
                                 {/* Buttons modifying file  */}
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                                    <button onClick={() => navigate(`/document/edit/${file._id}`)}>Edit</button>
+                                    {file.type !== "image" && (<button onClick={() => navigate(`/document/edit/${file._id}`)}>Edit</button>)}
                                     <button onClick={() => navigate(`/document/view/${file._id}`)}>View</button>
                                     <button onClick={() => handleClone(file._id)} disabled={cloningId === file._id}>{cloningId === file._id ? "Cloning..." : "Duplicate"}</button>
                                     <button onClick={() => handleRename(file._id)}>Rename</button>
                                     {!isOwner && (<button data-testid="cypress-soft-delete-btn" onClick={() => softDelete(file._id)}>Delete</button>)}
                                     {isOwner && (
-                                        <>
-                                            <button onClick={() => handleShare(file._id, "edit")}>Share Edit</button>
+                                        <>{/*NOTE: image files cannot be shared as editors */}
+                                        {file.type !== "image" && (<button onClick={() => handleShare(file._id, "edit")}>Share Edit</button>)}
                                             <button onClick={() => handleShare(file._id, "view")}>Share View</button>
                                             <button onClick={() =>togglePublic(file._id, file.isPublic)}>{file.isPublic? "Make Private": "Make Public"}</button>
                                             {file.isPublic && (<button onClick={() => copyLink(file)}>Copy Public Link</button>)}

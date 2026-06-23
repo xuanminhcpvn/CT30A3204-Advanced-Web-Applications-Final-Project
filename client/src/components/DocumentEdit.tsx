@@ -9,6 +9,7 @@ interface IDriveFile {
     filename: string;
     contents: string;
     canEdit: boolean;
+    type: "text" | "spreadsheet" | "slide" | "image";
 }
 
 //Dev note
@@ -63,6 +64,11 @@ const DocumentEdit = () => {
                 }
 
                 const data: IDriveFile = await res.json();
+                if (data.type === "image") {
+                    alert("Image files cannot be edited");
+                    navigate("/");
+                    return;
+                }
                 if (!data.canEdit) {
                     alert("You do not have permission to edit this document.");
                     navigate("/");

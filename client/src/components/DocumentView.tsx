@@ -6,9 +6,11 @@ interface IDocument {
     _id: string;
     filename: string;
     contents: string;
+    imageUrl?: string | null;
+    type: "text" | "spreadsheet" | "slide" | "image";
 }
 
-const DocumentPublic = () => {
+const DocumentView = () => {
     const { driveFileId } = useParams<{ driveFileId: string }>();
      const [jwt, setJwt] = useState<string | null>(null);
     const [document, setDocument] = useState<IDocument | null>(null);
@@ -49,12 +51,31 @@ const DocumentPublic = () => {
         <div style={{ padding: "20px" }}>
             <h2>{document?.filename}</h2>
             {document ? (
-                <ReactQuill value={document.contents} readOnly={true} modules={modules} theme="snow"/>
-                ) : (
-                <p>Loading...</p>
-            )}
+            <>
+            {/* image files can't use Quill */}
+            {document.type === "image" ? (
+            <img
+                src={`http://localhost:1234/uploads/${document.imageUrl}`}
+                alt={document.filename}
+                style={{
+                    maxWidth: "100%",
+                    maxHeight: "700px",
+                    objectFit: "contain"
+            }}/>
+            ) : (
+            <ReactQuill
+                value={document.contents}
+                readOnly={true}
+                modules={modules}
+                theme="snow"
+            />
+        )}
+    </>
+) : (
+    <p>Loading...</p>
+)}
         </div>
     );
 };
 
-export default DocumentPublic;
+export default DocumentView;

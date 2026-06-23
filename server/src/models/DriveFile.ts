@@ -4,6 +4,7 @@ interface IDriveFile extends Document {
     ownerId: mongoose.Types.ObjectId;
     filename: string;
     contents: string;
+    imageUrl?: string | null;
     type: "text" | "spreadsheet" | "slide" | "image";
     folderId?: Types.ObjectId | null;
     shareLink?: string | null;
@@ -21,6 +22,7 @@ const driveFileSchema: Schema = new Schema({
     ownerId: {type: Schema.Types.ObjectId, ref: "User",required: true},
     filename: {type: String,required: true},
     contents: {type: String, required: true},
+    imageUrl: {type: String, required: false, default:null},
     type: { type: String, enum: ["text", "spreadsheet", "slide", "image"], default: "text", required: true,},
     folderId: {type: Schema.Types.ObjectId, default: null, required: false},
     shareLink: {type: String,default: null, required: false},

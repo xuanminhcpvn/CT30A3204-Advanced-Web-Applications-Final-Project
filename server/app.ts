@@ -78,6 +78,7 @@
     
     }
 
+    console.log(process.env.NODE_ENV)
     //9. Then the app must listen to certain port to communicate with other processes and nodes
     app.listen(port, () => {
         console.log(`Server running on port ${port}`);

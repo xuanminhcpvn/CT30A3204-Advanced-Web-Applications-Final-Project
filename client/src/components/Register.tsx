@@ -27,8 +27,7 @@ const registerUser = async (username: string, email: string, password: string,im
         if (!res.ok) {
             throw new Error("Error fectching data");
         }
-        const data: any = await res.json();
-        console.log(data);
+        window.location.href = "/login";
 
     } catch (error) {
         if (error instanceof Error) {

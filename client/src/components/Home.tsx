@@ -16,10 +16,7 @@ interface IUser {
     _id: string;
     username: string;
     email: string;
-    imageId?: {
-        filename: string;
-        path: string;
-    } | null;
+    imageId?: string | null;
     imageUrl?: string;
 }
 
@@ -252,10 +249,10 @@ const Home = () => {
             
             const user = await res.json();
             const normalizedUser: IUser = {
-            ...user,
-            imageUrl: user.imageId
-                ? `http://localhost:1234/uploads/${user.imageId.filename}`
-                : undefined
+                ...user,
+                imageUrl: user.imageId
+                    ? `http://localhost:1234/uploads/${user.imageId}`
+                    : undefined
             };
 
             setUser(normalizedUser);
@@ -349,11 +346,12 @@ const Home = () => {
                 prev
                     ? {
                         ...prev,
-                        imageUrl: data.imageUrl
+                        imageId: data.filename,
+                        imageUrl: `http://localhost:1234/uploads/${data.filename}`
                     }
                     : prev
             );
-
+            await fetchMe();
         } catch (err) {
             console.log(err);
             alert("Image upload failed");

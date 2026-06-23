@@ -8,7 +8,7 @@ interface IUser extends Document {
         theme: "light" | "dark";
         language: string;
     };
-    imageId?: mongoose.Types.ObjectId | null;
+    imageId?: string
 }
 
 const userSchema: Schema = new Schema({
@@ -19,7 +19,7 @@ const userSchema: Schema = new Schema({
         theme: { type: String, default: "light" },
         language: { type: String, default: "en" }
     },
-    imageId: { type: Schema.Types.ObjectId, default: null,ref:"Image",required: false }
+    imageId: { type: String, default: null }
 })
 
 const User: mongoose.Model<IUser> = mongoose.model<IUser>("User", userSchema);

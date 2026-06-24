@@ -7,23 +7,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
-    const { t } = useTranslation();
-    const navigate = useNavigate();
-    return (
-        <div><h2>{t("Login Page")}</h2>
-            {/* Username input */}
-            <input type="text" placeholder={t("Username")} value={username} onChange={(e) => setUsername(e.target.value)}/>
-            {/* Password input */}
-            <input type="password"placeholder={t("Password")} value={password} onChange={(e) => setPassword(e.target.value)}/>
-            {/* Submit button */}
-            <button onClick={() => loginUser(username, password, setLoading, navigate, t)} disabled={loading}>{loading ? t("Logging in...") : t("Login")}</button>
-        </div>
-    );
-};
 const loginUser = async (username: string,password: string,setLoading: (value: boolean) => void,navigate: any,t: any) => {
     try {
         setLoading(true);
@@ -70,5 +53,24 @@ const loginUser = async (username: string,password: string,setLoading: (value: b
     } finally {
         setLoading(false);
     }
+};
+
+const Login = () => {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    return (
+        //style modified by AI
+        <div style={{ padding: "20px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "10px", maxWidth: "400px"}}><h2>{t("Login Page")}</h2>
+            {/* Username input */}
+            <input style={{ padding: "8px" }} type="text" placeholder={t("Username")} value={username} onChange={(e) => setUsername(e.target.value)}/>
+            {/* Password input */}
+            <input style={{ padding: "8px" }} type="password"placeholder={t("Password")} value={password} onChange={(e) => setPassword(e.target.value)}/>
+            {/* Submit button */}
+            <button onClick={() => loginUser(username, password, setLoading, navigate, t)} disabled={loading}>{loading ? t("Logging in...") : t("Login")}</button>
+        </div>
+    );
 };
 export default Login;

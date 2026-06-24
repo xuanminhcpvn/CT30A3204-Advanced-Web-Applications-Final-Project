@@ -48,7 +48,7 @@ const DocumentView = () => {
     };
 
     return (
-        <div style={{ padding: "20px" }}>
+        <div style={{ padding: "20px", maxWidth: "900px", margin: "0 auto" }}>
             <h2>{document?.filename}</h2>
             {document ? (
             <>
@@ -63,12 +63,9 @@ const DocumentView = () => {
                     objectFit: "contain"
             }}/>
             ) : (
-            <ReactQuill
-                value={document.contents}
-                readOnly={true}
-                modules={modules}
-                theme="snow"
-            />
+            <div style={{ width: "100%" }}>
+                <ReactQuill value={document.contents} readOnly={true} modules={modules} theme="snow"/>
+            </div>
         )}
     </>
 ) : (

@@ -434,6 +434,7 @@ const Home = () => {
                     <div style={{
                     marginBottom: "20px",
                     display: "flex",
+                    flexWrap: "wrap",//for mobile
                     alignItems: "center",
                     gap: "15px",
                     padding: "15px",
@@ -465,7 +466,7 @@ const Home = () => {
                 <div style={{ fontSize: "20px", fontWeight: "bold" }}>{t("Username")}: {user.username}</div>
                 <div style={{ marginBottom: "10px",fontWeight: "bold"}}>{t("Email")}: {user.email}</div>
                 {/*Upload input */}
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
                     <label htmlFor="profile-image-upload">{t("Upload profile image")}: </label>
                     <input id="profile-image-upload" type="file" accept="image/*" onChange={handleImageSelect}/>
                 </div>
@@ -479,7 +480,7 @@ const Home = () => {
         ) : (
             <>
                 {/* Top buttons */}
-                    <div style={{ marginBottom: "20px" }}>
+                    <div style={{ marginBottom: "20px", display: "flex",flexWrap: "wrap", gap: "10px"}}>
                         <button onClick={createFile} style={{ marginRight: "10px" }}>{t("New file")}</button>
                         <input style={{ marginRight: "10px", display: "none" }} id={imageUploadInputId} type="file" accept="image/*" onChange={handleDriveImageSelect}/>
                         <button style={{ marginRight: "10px" }}onClick={() => {const imageInput: HTMLElement | null = document.getElementById(imageUploadInputId); imageInput?.click();}}>{t("Upload Image")}</button>

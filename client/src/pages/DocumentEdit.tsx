@@ -191,16 +191,17 @@ const DocumentEdit = () => {
     }, [filename, contents, jwt, driveFileId, currentUserOwnsLock]);
 
     return (
-        <div>
-            <label htmlFor="filename">{t("Tiedostonimi")}: </label>
-            <input id="filename" value={filename} onChange={(e) => setFilename(e.target.value)} placeholder="Document title" disabled={!currentUserOwnsLock}/>
-            <ReactQuill theme="snow" /*or theme=bubble*/ value={contents} onChange={setContents} readOnly={!currentUserOwnsLock}/>
-            {isLocked && !currentUserOwnsLock && (
-                <p>{t("This document is locked by another user")}.</p>
-            )}
-            <button onClick={saveDocument}>{t("Save changes")}</button>
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px",  padding: "10px" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center",gap: "8px"}}>
+            <label htmlFor="filename">{t("Tiedostonimi")}:{" "}</label>
+            <input id="filename" value={filename} onChange={(e) => setFilename(e.target.value)} placeholder="Document title" disabled={!currentUserOwnsLock}style={{ flex: 1,minWidth: "200px"}}/>
         </div>
-        
+        <div style={{ width: "100%" }}>
+            <ReactQuill theme="snow" value={contents} onChange={setContents} readOnly={!currentUserOwnsLock} style={{width: "100%", minHeight: "200px"}}/>
+        </div>
+        {isLocked && !currentUserOwnsLock && (<p>{t("This document is locked by another user")}.</p>)}  
+        <button onClick={saveDocument} style={{ alignSelf: "flex-start"}}>{t("Save changes")}</button>
+    </div>
     );
 };
 

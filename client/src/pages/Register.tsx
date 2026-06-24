@@ -60,14 +60,14 @@ const Register = () => {
     const { t } = useTranslation();  
     const navigate = useNavigate();
     return (
-    <div>
+    <div style={{ padding: "20px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "10px"}}>
         <h2>{t("Registration Page")}</h2>
         {/* Username input */}
-        <input type="text" placeholder={t("Username")} value={username} onChange={(e) => setUsername(e.target.value)}/>
+        <input style={{ padding: "8px" }} type="text" placeholder={t("Username")} value={username} onChange={(e) => setUsername(e.target.value)}/>
         {/* Email input */}
-        <input type="email" placeholder={t("Email")} value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input  style={{ padding: "8px" }}type="email" placeholder={t("Email")} value={email} onChange={(e) => setEmail(e.target.value)} />
         {/* Password input */}
-        <input type="password" placeholder={t("Password")}value={password} onChange={(e) => setPassword(e.target.value)}/>
+        <input style={{ padding: "8px" }} type="password" placeholder={t("Password")}value={password} onChange={(e) => setPassword(e.target.value)}/>
         {/* Profile image input */}
         <input type="file" accept="image/*" onChange={(e) => {
             if (e.target.files && e.target.files[0]) {

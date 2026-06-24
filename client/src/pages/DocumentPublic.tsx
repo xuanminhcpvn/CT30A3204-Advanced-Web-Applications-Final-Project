@@ -44,7 +44,7 @@ const DocumentPublic = () => {
     }
 
     if (!document) {
-        return <div style={{ padding: "20px" }}>Document not found</div>;
+        return <div style={{ padding: "20px",maxWidth: "900px",margin: "0 auto"}}>Document not found</div>;
     }
 
     return (

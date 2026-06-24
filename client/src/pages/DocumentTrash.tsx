@@ -181,14 +181,15 @@ const Trash = () => {
                         return (
                             <div key={file._id}
                                 style={{
-                                    border: "1px solid #ccc",
+                                    border: "1px solid var(--border)",
                                     padding: "15px",
                                     marginBottom: "10px",
                                     borderRadius: "8px",
+                                    background: "var(--card)" 
                                 }}>
                                 <strong>{file.filename}</strong>
                                 <div>{t("Deleted at: ")} {formatDate(file.softDeletedAt)}</div>
-                                <div style={{ marginTop: "10px" }}>
+                                <div style={{ marginTop: "10px", display: "flex",  flexWrap: "wrap", gap: "8px"}}>
                                     {/* ONLY ALLOWED ACTIONS */}
                                     {isOwner && (
                                     <>

@@ -16,15 +16,15 @@ const SearchSortTool = ({
 }: Props) => {
     const { t } = useTranslation();
     return (
-        <>
-            <input type="text" placeholder={t("Search documents...")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
+        <div style={{display: "flex",flexWrap: "wrap", gap: "10px", alignItems: "center"}}>
+            <input style={{flex: 1, minWidth: "180px" }} type="text" placeholder={t("Search documents...")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
             <label>{t("Sort By")}: </label>
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                 <option value="name">{t("By Name")}</option>
                 <option value="createdAt">{t("By Created Date")}</option>
                 <option value="updatedAt">{t("Last Updated Date")}</option>
             </select>
-        </>
+        </div>
     );
 };
 

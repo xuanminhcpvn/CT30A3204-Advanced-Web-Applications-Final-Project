@@ -59,8 +59,16 @@ const Navigation = ({setTheme,theme, setLanguage, language}: {
         window.location.href = "/"
     }
 
+    //This UI section is modified by ChatGPT (places where comments are)
     return (
-    <nav style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+    <nav
+        style={{
+            display: "flex",
+            flexWrap: "wrap", //allows mobile wrapping
+            gap: window.innerWidth < 600 ? "10px" : "20px", //responsive spacing
+            alignItems: "center"
+        }}
+    >
         <Link to="/">{t("Home")}</Link>
 
         {!jwt ? (

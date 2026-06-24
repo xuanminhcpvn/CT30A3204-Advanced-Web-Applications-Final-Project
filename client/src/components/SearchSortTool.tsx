@@ -1,36 +1,28 @@
 // components/SearchSortTool.tsx
 
+import { useTranslation } from "react-i18next";
+
 interface Props {
     searchTerm: string;
     setSearchTerm: (value: string) => void;
     sortBy: string;
     setSortBy: (value: string) => void;
 }
-
 const SearchSortTool = ({
     searchTerm,
     setSearchTerm,
     sortBy,
     setSortBy
 }: Props) => {
+    const { t } = useTranslation();
     return (
         <>
-            <input
-                type="text"
-                placeholder="Search documents..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
-
-            <label>Sort By: </label>
-
-            <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-            >
-                <option value="name">Name</option>
-                <option value="createdAt">Created Date</option>
-                <option value="updatedAt">Last Updated</option>
+            <input type="text" placeholder={t("Search documents...")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
+            <label>{t("Sort By")}: </label>
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="name">{t("By Name")}</option>
+                <option value="createdAt">{t("By Created Date")}</option>
+                <option value="updatedAt">{t("Last Updated Date")}</option>
             </select>
         </>
     );

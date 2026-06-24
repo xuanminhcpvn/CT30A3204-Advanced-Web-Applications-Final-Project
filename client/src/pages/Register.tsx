@@ -4,6 +4,7 @@
   Last modified at: 23/06/206
 */
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 const registerUser = async (username: string, email: string, password: string,image: File | null, setLoading: (value: boolean) => void) => {
     try {
         setLoading(true);
@@ -44,42 +45,26 @@ const Register = () => {
     const [password, setPassword] = useState("");
     const [image, setImage] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();  
     return (
-        <div>
-            <h2>Register</h2>
-            {/* Username input */}
-            <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-            />
-            {/* Email input */}
-            <input
-                type="email" 
-                placeholder="Email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)} 
-                />
-            {/* Password input */}
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
-            {/* Profile image input */}
-            <input type="file" accept="image/*" onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                        setImage(e.target.files[0]);
-                    }
-                }}
-            />
-            {/* Submit button */}
-            <button onClick={() => registerUser(username,email, password, image, setLoading)} disabled={loading}>
-                {loading ? "Registering..." : "Register"}
-            </button>
-        </div>
+    <div>
+        <h2>{t("Registration Page")}</h2>
+        {/* Username input */}
+        <input type="text" placeholder={t("Username")} value={username} onChange={(e) => setUsername(e.target.value)}/>
+        {/* Email input */}
+        <input type="email" placeholder={t("Email")} value={email} onChange={(e) => setEmail(e.target.value)} />
+        {/* Password input */}
+        <input type="password" placeholder={t("Password")}value={password} onChange={(e) => setPassword(e.target.value)}/>
+        {/* Profile image input */}
+        <input type="file" accept="image/*" onChange={(e) => {
+            if (e.target.files && e.target.files[0]) {
+                setImage(e.target.files[0]);
+            }
+        }}
+        />
+        {/* Submit button */}
+        <button onClick={() => registerUser(username,email, password, image, setLoading)} disabled={loading}>{loading ? t("Registering...") : t("Register")}</button>
+    </div>
     );
 };
 export default Register;

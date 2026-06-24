@@ -9,14 +9,18 @@ import DocumentEdit from './pages/DocumentEdit';
 import DocumentPublic from './pages/DocumentPublic';
 import DocumentTrash from './pages/DocumentTrash';
 import { useEffect, useState } from 'react';
+import i18n from './i18n';
+import { useTranslation } from 'react-i18next';
 function App() { 
-  const [theme, setTheme] = useState<"light" | "dark">("light");//Parent owns state
+  const [theme, setTheme] = useState<"light" | "dark">("light");//Parent owns Navigation state
+  const [language, setLanguage] = useState<"en" | "fi">("en");
   const [jwt, setJwt] = useState<string | null>(null);
-
+  const { t } = useTranslation();
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token){return;}
     setJwt(token);
+    
     const fetchSettings = async () => {
         try {
             const res = await fetch("/api/user/me", {
@@ -27,6 +31,7 @@ function App() {
             if (!res.ok){return};
             const user = await res.json();
             setTheme(user.settings.theme);
+            setLanguage(user.settings.language);
             document.documentElement.classList.remove("light", "dark");
             document.documentElement.classList.add(user.settings.theme);
             localStorage.setItem("theme", user.settings.theme);
@@ -36,26 +41,31 @@ function App() {
     };
     fetchSettings();
   }, []);
-
+  //themeUseEffect
   useEffect(() => {
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(theme);
   }, [theme]);
 
+  //language useEffect
   useEffect(() => {
-    const saved = localStorage.getItem("theme") as "light" | "dark" | null;
-    if (saved) {
-      setTheme(saved);
-    }
+    i18n.changeLanguage(language);
+  }, [language]);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
+    const savedLanguage = localStorage.getItem("language") as "en" | "fi" | null;
+    if (savedTheme) {setTheme(savedTheme);}
+    if (savedLanguage) {setLanguage(savedLanguage);}
   }, []);
   return (
     <BrowserRouter>
-      <Navigation setTheme={setTheme} theme={theme}/>
+      <Navigation setTheme={setTheme} theme={theme} setLanguage={setLanguage} language={language}/>
       <div className="App">
-        <h1 style={{ color: "var(--text)" }}>File Drive App</h1> 
+        <h1 style={{ color: "var(--text)" }}>{t("File Drive App")}</h1> 
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/trash" element={<DocumentTrash />} />
+          <Route path="/trash" element={<DocumentTrash />} /> 
           <Route path="/document/edit/:driveFileId" element={<DocumentEdit />} />
           <Route path="/document/view/:driveFileId" element={<DocumentView />} />
           <Route path="/document/public/:driveFileId" element={<DocumentPublic />} />

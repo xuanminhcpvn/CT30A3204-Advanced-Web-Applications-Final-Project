@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchSortTool from "../components/SearchSortTool";
 import PaginationTool from "../components/PaginationTool";
+import { useTranslation } from "react-i18next";
 
 interface IDriveFile {
     _id: string;
@@ -33,6 +34,7 @@ const Trash = () => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 5;
 
+    const { t } = useTranslation();  
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -153,66 +155,52 @@ const Trash = () => {
         setCurrentPage(1);
     }, [searchTerm, sortBy]);
 
+    //COULD REFACTOR THIS LATER 
+    const formatDate = (dateInput: string) => {
+        const date: Date = new Date(dateInput);
+        const day:string = String(date.getDate()).padStart(2, "0");
+        const month:string = String(date.getMonth() + 1).padStart(2, "0");
+        const year:string = String(date.getFullYear());
+        return `${day}.${month}.${year}`;
+    };
+
     return (
         <div style={{ padding: "20px", maxWidth: "900px", margin: "0 auto" }}>
-            <h2>Own Trash Bin</h2>
-
-            <button onClick={() => navigate("/")}>Back to Home</button>
-
+            <h2>{t("Own Trash Bin")}</h2>
+            <button onClick={() => navigate("/")}>{t("Back to Home")}</button>
             {!jwt ? (
-                <p>Please login</p>
+                <p>{t("Please login to fetch the files.")}</p>
             ) : (
                 <>
                     {/* search and sort at same level */}
                     <SearchSortTool searchTerm={searchTerm} setSearchTerm={setSearchTerm} sortBy={sortBy}setSortBy={setSortBy}/>
-                    {loading && <p>Loading...</p>}
-
+                    {loading && <p>{t("Loading...")}</p>}
                     {/* FILE LIST */}
                     {paginatedFiles.map((file) => {
                         const isOwner = user?._id === file.ownerId;
-
                         return (
-                            <div
-                                key={file._id}
+                            <div key={file._id}
                                 style={{
                                     border: "1px solid #ccc",
                                     padding: "15px",
                                     marginBottom: "10px",
                                     borderRadius: "8px",
-                                }}
-                            >
+                                }}>
                                 <strong>{file.filename}</strong>
-                                <div>Deleted at: {file.softDeletedAt}</div>
-
+                                <div>{t("Deleted at: ")} {formatDate(file.softDeletedAt)}</div>
                                 <div style={{ marginTop: "10px" }}>
                                     {/* ONLY ALLOWED ACTIONS */}
-
                                     {isOwner && (
-                                        <>
-                                            <button
-                                                onClick={() =>
-                                                    restoreFile(file._id)
-                                                }
-                                            >
-                                                Restore
-                                            </button>
-
-                                            <button
-                                                onClick={() =>
-                                                    permanentDelete(file._id)
-                                                }
-                                                style={{ color: "red" }}
-                                            >
-                                                Delete Forever
-                                            </button>
-                                        </>
+                                    <>
+                                        <button style={{ marginRight: "10px" }} onClick={() =>restoreFile(file._id)}>{t("Restore file")}</button>
+                                        <button style={{ marginRight: "10px", color: "red"}} onClick={() =>permanentDelete(file._id)}>{t("Delete file forever")}</button></>
                                     )}
                                 </div>
                             </div>
                         );
                     })}
                     <PaginationTool currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage}/>
-                    {files.length === 0 && !loading && <p>No trash items</p>}
+                    {files.length === 0 && !loading && <p>{t("No file in trash")}</p>}
                 </>
             )}
         </div>

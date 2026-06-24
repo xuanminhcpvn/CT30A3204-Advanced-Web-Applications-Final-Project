@@ -1,10 +1,16 @@
 import { Link, useNavigate } from "react-router-dom"
 import { useEffect, useState} from "react";
+import { useTranslation } from 'react-i18next';
 //Problem: How to share state between components => app.tsx and 
-const Navigation = ({setTheme, theme}: {setTheme: (mode: "light" | "dark") => void; theme: "light" | "dark";}) => {
-    const [jwt, setJwt] = useState<string | null>(null);
+const Navigation = ({setTheme,theme, setLanguage, language}: {
+    setTheme: (mode: "light" | "dark") => void;
+    theme: "light" | "dark";
+    setLanguage: (language: "en" | "fi") => void;
+    language: "en" | "fi";
+}) => {
+    const [jwt, setJwt] = useState<string | null>(null);//it will be best to pass this from app.tsx 
     const navigate = useNavigate();
-
+    const { t } = useTranslation();
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
@@ -12,7 +18,8 @@ const Navigation = ({setTheme, theme}: {setTheme: (mode: "light" | "dark") => vo
         }
     }, []);
     
-    const handleLanguageChange = async (language: string) => {
+    const handleLanguageChange = async (language: "en" | "fi") => {
+        setLanguage(language)
         try {
             await fetch("/api/user/me/settings", {
                 method: "PATCH",
@@ -29,8 +36,8 @@ const Navigation = ({setTheme, theme}: {setTheme: (mode: "light" | "dark") => vo
             console.log("Failed to update language:", err);
         }
     };
-    const handleLightModeChange = async (mode: "light" | "dark") => {
-        setTheme(mode);
+    const handleLightModeChange = async (theme: "light" | "dark") => {
+        setTheme(theme);
         try {
             await fetch("/api/user/me/settings", {
                 method: "PATCH",
@@ -38,9 +45,9 @@ const Navigation = ({setTheme, theme}: {setTheme: (mode: "light" | "dark") => vo
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${jwt}`
                 },
-                body: JSON.stringify({ theme: mode })
+                body: JSON.stringify({ theme: theme })
             });
-            localStorage.setItem("theme", mode);
+            localStorage.setItem("theme", theme);
         } catch (err) {
             console.log("Failed to update theme:", err);
         }
@@ -54,22 +61,22 @@ const Navigation = ({setTheme, theme}: {setTheme: (mode: "light" | "dark") => vo
 
     return (
     <nav style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-        <Link to="/">Home</Link>
+        <Link to="/">{t("Home")}</Link>
 
         {!jwt ? (
             <>
-                <Link to="/login">Login</Link>
-                <Link to="/register">Register</Link>
+                <Link to="/login">{t("Login")}</Link>
+                <Link to="/register">{t("Register")}</Link>
             </>
         ) : (
-            <button onClick={logout}>Logout</button>
+            <button onClick={logout}>{t("Logout")}</button>
         )}
 
-        <button onClick={() => navigate("/trash")}>Trash</button>
+        <button onClick={() => navigate("/trash")}>{t("Trash")}</button>
         <button onClick={() => handleLanguageChange("fi")}>FI</button>
         <button onClick={() => handleLanguageChange("en")}>EN</button>
-        <button onClick={() => handleLightModeChange("light")}>Light</button>
-        <button onClick={() => handleLightModeChange("dark")}>Dark</button>
+        <button onClick={() => handleLightModeChange("light")}>{t("Light")}</button>
+        <button onClick={() => handleLightModeChange("dark")}>{t("Dark")}</button>
     </nav>
     );
 }

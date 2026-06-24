@@ -1,11 +1,10 @@
 /*CT30A3204 Advanced Web Applications Final Project
   Author: Minh Pham
   Created at: 20/06/2026
-  Last modified at: 23/06/206
+  Last modified at: 24/06/206
 */
-
 import { useState } from "react";
-
+import { useTranslation } from "react-i18next";
 const loginUser = async (username: string,password: string,setLoading: (value: boolean) => void ) => {
     try {
         setLoading(true);
@@ -17,11 +16,7 @@ const loginUser = async (username: string,password: string,setLoading: (value: b
                 password
             })
         });
-
-        if (!response.ok) {
-            throw new Error("Error fetching data");
-        }
-
+        if (!response.ok) { throw new Error("Error fetching data"); }
         const data = await response.json();
         console.log(data);
         // Store token to localStorage if backend return JWT 
@@ -40,35 +35,20 @@ const loginUser = async (username: string,password: string,setLoading: (value: b
         setLoading(false);
     }
 };
-
 const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-
+    const { t } = useTranslation();
     return (
-        <div>
-            <h2>Login</h2>
+        <div><h2>{t("Login Page")}</h2>
             {/* Username input */}
-            <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-            />
+            <input type="text" placeholder={t("Username")} value={username} onChange={(e) => setUsername(e.target.value)}/>
             {/* Password input */}
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
+            <input type="password"placeholder={t("Password")} value={password} onChange={(e) => setPassword(e.target.value)}/>
             {/* Submit button */}
-            <button onClick={() => loginUser(username, password, setLoading)} disabled={loading}>
-                {loading ? "Logging in..." : "Login"}
-            </button>
+            <button onClick={() => loginUser(username, password, setLoading)} disabled={loading}>{loading ? t("Logging in...") : t("Login")}</button>
         </div>
     );
 };
-
 export default Login;

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchSortTool from "../components/SearchSortTool";
 import PaginationTool from "../components/PaginationTool";
+import { useTranslation } from "react-i18next";
 
 interface IDriveFile {
     _id: string;
@@ -34,13 +35,13 @@ const Home = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 5;
-    //clone
-    const [cloningId, setCloningId] = useState<string | null>(null);
-    //profile+ image document upload
-    const [uploadingImage, setUploadingImage] = useState<boolean>(false);
+    
+    const [cloningId, setCloningId] = useState<string | null>(null);    //clone
+    const [uploadingImage, setUploadingImage] = useState<boolean>(false);//profile+ image document upload
     const navigate = useNavigate();
     //Updated state control to set jtw token once and fetch everything else when jwt is set or refreshed
     const imageUploadInputId: string = "drive-image-upload";
+    const { t } = useTranslation();//Translation
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
@@ -414,7 +415,7 @@ const Home = () => {
             });
 
             if (!res.ok){
-                throw new Error("Cloning  failed");
+                throw new Error("Cloning failed");
             }
             const newFile: IDriveFile = await res.json();
             setFiles((prev) => [newFile, ...prev]);//update UI
@@ -431,10 +432,9 @@ const Home = () => {
     //I used chatGPT to refine UI
     return (
         <div style={{ padding: "20px", maxWidth: "900px", margin: "0 auto", background: "var(--bg)", color: "var(--text)" }}>
-            <h2 style={{ color: "var(--text)" }}>My Drive</h2>
+            <h2 style={{ color: "var(--text)" }}>{t("My Drive")}</h2>
                 {user && (
-                    <div
-                        style={{
+                    <div style={{
                     marginBottom: "20px",
                     display: "flex",
                     alignItems: "center",
@@ -446,48 +446,47 @@ const Home = () => {
                     }}
                     >
                     {user.imageUrl ? (
-                        <img
-                            src={user.imageUrl}
-                            alt="profile"
+                        <img src={user.imageUrl} alt="profile"
                             style={{
-                                width: "100px",
-                                height: "100px",
-                                borderRadius: "50%",
-                                objectFit: "cover",
-                                border: "2px solid var(--border)"
+                            width: "100px",
+                            height: "100px",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            border: "2px solid var(--border)"
                             }}
                         />
                     ) : (
-                        <div
-                            style={{
-                                width: "100px",
-                                height: "100px",
-                                borderRadius: "50%",
-                                background: "var(--border)"
+                        <div style={{
+                            width: "100px",
+                            height: "100px",
+                            borderRadius: "50%",
+                            background: "var(--border)"
                             }}
                         />
                     )}
-
-            <div>
-                <div style={{ fontSize: "20px", fontWeight: "bold" }}>{user.username}</div>
-                <div style={{ marginBottom: "10px" }}>{user.email}</div>
+            <div style={{width: "100%", display: "flex",flexDirection: "column", alignItems: "center"}}>
+                <div style={{ fontSize: "20px", fontWeight: "bold" }}>{t("Username")}: {user.username}</div>
+                <div style={{ marginBottom: "10px",fontWeight: "bold"}}>{t("Email")}: {user.email}</div>
                 {/*Upload input */}
-                <input type="file" accept="image/*" onChange={handleImageSelect}/>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <label htmlFor="profile-image-upload">{t("Upload profile image")}: </label>
+                    <input id="profile-image-upload" type="file" accept="image/*" onChange={handleImageSelect}/>
+                </div>
                 {/*Loading state */}
-                {uploadingImage && <div>Uploading...</div>}
+                {uploadingImage && <div>{t("Uploading...")}</div>}
             </div>
         </div>
         )}
         {!jwt ? (
-            <p>Please login to fetch the files.</p>
+            <p>{t("Please login to fetch the files")}.</p>
         ) : (
             <>
                 {/* Top buttons */}
                     <div style={{ marginBottom: "20px" }}>
-                        <button onClick={createFile} style={{ marginRight: "10px" }}>New File</button>
-                        <input id={imageUploadInputId} type="file" accept="image/*" style={{ display: "none" }} onChange={handleDriveImageSelect}/>
-                        <button onClick={() => {const imageInput: HTMLElement | null = document.getElementById(imageUploadInputId); imageInput?.click();}}>Upload Image</button>
-                        <button onClick={fetchFiles}>Refresh</button>
+                        <button onClick={createFile} style={{ marginRight: "10px" }}>{t("New file")}</button>
+                        <input style={{ marginRight: "10px", display: "none" }} id={imageUploadInputId} type="file" accept="image/*" onChange={handleDriveImageSelect}/>
+                        <button style={{ marginRight: "10px" }}onClick={() => {const imageInput: HTMLElement | null = document.getElementById(imageUploadInputId); imageInput?.click();}}>{t("Upload Image")}</button>
+                        <button style={{ marginRight: "10px" }} onClick={fetchFiles}>{t("Refresh")}</button>
                         <SearchSortTool searchTerm={searchTerm} setSearchTerm={setSearchTerm} sortBy={sortBy}setSortBy={setSortBy}/>
                     </div>
                     {loading && <p>Loading...</p>}
@@ -504,25 +503,29 @@ const Home = () => {
                                     }}>
                                 {/* File Info */}
                                 <div style={{ marginBottom: "10px" }}>
-                                    <strong style={{ fontSize: "18px" }}>Filename: {file.filename}</strong>
-                                    <div>Type: {file.type}</div>
-                                    <div>Created: {formatDate(file.createdAt)}</div>
-                                    <div>Updated: {formatDate(file.updatedAt)}</div>
-                                    <div>{file.isPublic ? "Public" : "Private"}</div>
+                                    <strong style={{ fontSize: "18px" }}>{t("File name")}: {file.filename}</strong>
+                                    <div> {t("File type: ")} 
+                                        {file.type.startsWith("image") && t("Image file")}
+                                        {file.type.startsWith("text") && t("Text file")}
+                                        {!file.type.startsWith("image") && !file.type.startsWith("text") && t("Unknown file")}
+                                    </div>
+                                    <div>{t("Created")}: {formatDate(file.createdAt)}</div>
+                                    <div>{t("Updated")}: {formatDate(file.updatedAt)}</div>
+                                    <div>{file.isPublic ? t("Public") : t("Private")}</div>
                                 </div>
                                 {/* Buttons modifying file  */}
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                                    {file.type !== "image" && (<button onClick={() => navigate(`/document/edit/${file._id}`)}>Edit</button>)}
-                                    <button onClick={() => navigate(`/document/view/${file._id}`)}>View</button>
-                                    <button onClick={() => handleClone(file._id)} disabled={cloningId === file._id}>{cloningId === file._id ? "Cloning..." : "Duplicate"}</button>
-                                    <button onClick={() => handleRename(file._id)}>Rename</button>
+                                    {file.type !== "image" && (<button onClick={() => navigate(`/document/edit/${file._id}`)}>{t("Edit")}</button>)}
+                                    <button onClick={() => navigate(`/document/view/${file._id}`)}>{t("View")}</button>
+                                    <button onClick={() => handleClone(file._id)} disabled={cloningId === file._id}>{cloningId === file._id ? t("Cloning...") : t("Duplicate")}</button>
+                                    <button onClick={() => handleRename(file._id)}>{t("Rename")}</button>
                                     {isOwner && (
                                         <>{/*NOTE: image files cannot be shared as editors */}
-                                        {file.type !== "image" && (<button onClick={() => handleShare(file._id, "edit")}>Share Edit</button>)}
-                                            <button onClick={() => handleShare(file._id, "view")}>Share View</button>
-                                            <button onClick={() =>togglePublic(file._id, file.isPublic)}>{file.isPublic? "Make Private": "Make Public"}</button>
-                                            <button data-testid="cypress-soft-delete-btn" onClick={() => softDelete(file._id)}>Move to Trash</button>
-                                            {file.isPublic && (<button onClick={() => copyLink(file)}>Copy Public Link</button>)}
+                                        {file.type !== "image" && (<button onClick={() => handleShare(file._id, "edit")}>{t("Share Edit")}</button>)}
+                                            <button onClick={() => handleShare(file._id, "view")}>{t("Share View")}</button>
+                                            <button onClick={() =>togglePublic(file._id, file.isPublic)}>{file.isPublic ? t("Make Private"): t("Make Public")}</button>
+                                            <button data-testid="cypress-soft-delete-btn" onClick={() => softDelete(file._id)}>{t("Move to Trash")}</button>
+                                            {file.isPublic && (<button onClick={() => copyLink(file)}>{t("Copy Public Link")}</button>)}
                                         </>
                                     )}
                                 </div>
@@ -531,7 +534,7 @@ const Home = () => {
                     })}
                     <PaginationTool currentPage={currentPage} totalPages={Math.ceil(visibleFiles.length / itemsPerPage)} setCurrentPage={setCurrentPage}/>
                     {files.length === 0 && !loading && (
-                        <p>No files found</p>
+                        <p>{t("No files found")}</p>
                     )}
                 </>
             )}

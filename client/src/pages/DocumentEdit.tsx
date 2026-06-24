@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ReactQuill from "react-quill-new";
 import "react-quill/dist/quill.snow.css";
+import { useTranslation } from "react-i18next";
 //import "react-quill/dist/quill.bubble.css";//or bubble whatever
 
 interface IDriveFile {
@@ -39,6 +40,7 @@ const DocumentEdit = () => {
     const [isLocked, setIsLocked] = useState<boolean>(false);
     const [currentUserOwnsLock, setCurrentUserOwnsLock] = useState<boolean>(false);
     const [jwt, setJwt] = useState<string | null>(null);
+    const {t} = useTranslation();
     //Token init once => Separate refresh token function later
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -189,12 +191,13 @@ const DocumentEdit = () => {
 
     return (
         <div>
-            <input value={filename} onChange={(e) => setFilename(e.target.value)} placeholder="Document title" disabled={!currentUserOwnsLock}/>
+            <label htmlFor="filename">{t("Tiedostonimi")}: </label>
+            <input id="filename" value={filename} onChange={(e) => setFilename(e.target.value)} placeholder="Document title" disabled={!currentUserOwnsLock}/>
             <ReactQuill theme="snow" /*or theme=bubble*/ value={contents} onChange={setContents} readOnly={!currentUserOwnsLock}/>
             {isLocked && !currentUserOwnsLock && (
-                <p>This document is locked by another user.</p>
+                <p>{t("This document is locked by another user")}.</p>
             )}
-            <button onClick={saveDocument}>Save</button>
+            <button onClick={saveDocument}>{t("Save changes")}</button>
         </div>
         
     );

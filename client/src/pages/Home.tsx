@@ -135,22 +135,6 @@ const Home = () => {
         }
     };
 
-    const permanentDelete = async (id: string) => {
-        try {
-            const res = await fetch(`/api/files/${id}/permanent-delete`, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${jwt}`
-                }
-            });
-            if (!res.ok) {
-                throw new Error("Permanent delete failed");
-            }
-            fetchFiles();
-        } catch (err) {
-            console.log(err);
-        }
-    };
     // Rename file
     const handleRename = async (fileId: string) => {
         const newFileName: string | null = prompt("Enter new file name:");
@@ -446,18 +430,19 @@ const Home = () => {
     //basic UI (see previous git commit) is done by me
     //I used chatGPT to refine UI
     return (
-        <div style={{ padding: "20px", maxWidth: "900px", margin: "0 auto" }}>
-            <h2>My Drive</h2>
+        <div style={{ padding: "20px", maxWidth: "900px", margin: "0 auto", background: "var(--bg)", color: "var(--text)" }}>
+            <h2 style={{ color: "var(--text)" }}>My Drive</h2>
                 {user && (
                     <div
                         style={{
-                        marginBottom: "20px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "15px",
-                        padding: "15px",
-                        border: "1px solid #ccc",
-                        borderRadius: "8px"
+                    marginBottom: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "15px",
+                    padding: "15px",
+                    border: "1px solid var(--border)",
+                    borderRadius: "8px",
+                    background: "var(--card)"
                     }}
                     >
                     {user.imageUrl ? (
@@ -469,7 +454,7 @@ const Home = () => {
                                 height: "100px",
                                 borderRadius: "50%",
                                 objectFit: "cover",
-                                border: "2px solid #ccc"
+                                border: "2px solid var(--border)"
                             }}
                         />
                     ) : (
@@ -478,34 +463,26 @@ const Home = () => {
                                 width: "100px",
                                 height: "100px",
                                 borderRadius: "50%",
-                                background: "#ccc"
+                                background: "var(--border)"
                             }}
                         />
                     )}
 
             <div>
-                <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-                    {user.username}
-                </div>
+                <div style={{ fontSize: "20px", fontWeight: "bold" }}>{user.username}</div>
                 <div style={{ marginBottom: "10px" }}>{user.email}</div>
-
-                {/* EDITED: Upload input */}
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                />
-
-                {/* EDITED: Loading state */}
+                {/*Upload input */}
+                <input type="file" accept="image/*" onChange={handleImageSelect}/>
+                {/*Loading state */}
                 {uploadingImage && <div>Uploading...</div>}
             </div>
-            </div>
-            )}
-            {!jwt ? (
-                <p>Please login to fetch the files.</p>
-            ) : (
-                <>
-                    {/* Top buttons */}
+        </div>
+        )}
+        {!jwt ? (
+            <p>Please login to fetch the files.</p>
+        ) : (
+            <>
+                {/* Top buttons */}
                     <div style={{ marginBottom: "20px" }}>
                         <button onClick={createFile} style={{ marginRight: "10px" }}>New File</button>
                         <input id={imageUploadInputId} type="file" accept="image/*" style={{ display: "none" }} onChange={handleDriveImageSelect}/>
@@ -517,24 +494,21 @@ const Home = () => {
                     {paginatedFiles.map((file) => {
                         const isOwner: boolean = user?._id === file.ownerId;
                         return (
-                            <div
-                                key={file._id}
+                            <div key={file._id}
                                 style={{
-                                    border: "1px solid #ccc",
+                                    border: "1px solid var(--border)",
                                     borderRadius: "8px",
                                     padding: "15px",
-                                    marginBottom: "15px"
-                                }}
-                            >
+                                    marginBottom: "15px",
+                                    background: "var(--card)"
+                                    }}>
                                 {/* File Info */}
                                 <div style={{ marginBottom: "10px" }}>
                                     <strong style={{ fontSize: "18px" }}>Filename: {file.filename}</strong>
                                     <div>Type: {file.type}</div>
                                     <div>Created: {formatDate(file.createdAt)}</div>
                                     <div>Updated: {formatDate(file.updatedAt)}</div>
-                                    <div>
-                                        {file.isPublic ? "Public" : "Private"}
-                                    </div>
+                                    <div>{file.isPublic ? "Public" : "Private"}</div>
                                 </div>
                                 {/* Buttons modifying file  */}
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>

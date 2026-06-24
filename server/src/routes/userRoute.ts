@@ -112,4 +112,24 @@ router.post("/profile-image", validateToken, upload.single("image"), async (req:
         }
     }
 );
+
+//To modify theme and language
+router.patch("/me/settings", validateToken, async (req: CustomRequest, res: Response) => {
+    try {
+        const userId: string | null = req.user?.userId;
+        const { theme, language } = req.body;
+        const user:IUser | null = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        if (theme) {user.settings.theme = theme;}
+        if (language) {user.settings.language = language;}
+        await user.save();
+        return res.status(200).json({settings: user.settings});
+
+    } catch (error) {
+        console.error("Error updating settings:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 export default router;

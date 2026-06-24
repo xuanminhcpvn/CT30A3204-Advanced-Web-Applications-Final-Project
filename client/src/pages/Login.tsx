@@ -5,10 +5,29 @@
 */
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-const loginUser = async (username: string,password: string,setLoading: (value: boolean) => void ) => {
+import { useNavigate } from "react-router-dom";
+
+const Login = () => {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    return (
+        <div><h2>{t("Login Page")}</h2>
+            {/* Username input */}
+            <input type="text" placeholder={t("Username")} value={username} onChange={(e) => setUsername(e.target.value)}/>
+            {/* Password input */}
+            <input type="password"placeholder={t("Password")} value={password} onChange={(e) => setPassword(e.target.value)}/>
+            {/* Submit button */}
+            <button onClick={() => loginUser(username, password, setLoading, navigate, t)} disabled={loading}>{loading ? t("Logging in...") : t("Login")}</button>
+        </div>
+    );
+};
+const loginUser = async (username: string,password: string,setLoading: (value: boolean) => void,navigate: any,t: any) => {
     try {
         setLoading(true);
-        const response = await fetch("http://localhost:3000/api/user/login", {
+        const res = await fetch("http://localhost:3000/api/user/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -16,15 +35,32 @@ const loginUser = async (username: string,password: string,setLoading: (value: b
                 password
             })
         });
-        if (!response.ok) { throw new Error("Error fetching data"); }
-        const data = await response.json();
+        if (!res.ok) {
+            switch (res.status) {
+                case 400:
+                    alert(t("Username and password required"));
+                    break;
+                case 401:
+                    alert(t("Invalid username or password"));
+                    break;
+                case 403:
+                    alert(t("User not found. Register first!"));
+                    navigate("/register");
+                    break;
+                default:
+                    alert(t("Login failed. Error fetching data"));
+            }
+            return;
+        }
+        
+        const data = await res.json();
         console.log(data);
         // Store token to localStorage if backend return JWT 
         if (data.token) {
             localStorage.setItem("token", data.token);
         }
         // Redirect to Drive Home page after login
-        if (response.status === 200) {
+        if (res.status === 200) {
             window.location.href = "/";
         }
     } catch (error) {
@@ -34,21 +70,5 @@ const loginUser = async (username: string,password: string,setLoading: (value: b
     } finally {
         setLoading(false);
     }
-};
-const Login = () => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
-    const { t } = useTranslation();
-    return (
-        <div><h2>{t("Login Page")}</h2>
-            {/* Username input */}
-            <input type="text" placeholder={t("Username")} value={username} onChange={(e) => setUsername(e.target.value)}/>
-            {/* Password input */}
-            <input type="password"placeholder={t("Password")} value={password} onChange={(e) => setPassword(e.target.value)}/>
-            {/* Submit button */}
-            <button onClick={() => loginUser(username, password, setLoading)} disabled={loading}>{loading ? t("Logging in...") : t("Login")}</button>
-        </div>
-    );
 };
 export default Login;

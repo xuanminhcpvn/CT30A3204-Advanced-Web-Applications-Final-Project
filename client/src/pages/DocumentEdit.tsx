@@ -66,13 +66,14 @@ const DocumentEdit = () => {
                 }
 
                 const data: IDriveFile = await res.json();
+                //These two errors below can only checked by forcefully accessing the route
                 if (data.type === "image") {
-                    alert("Image files cannot be edited");
+                    alert(t("Image file cannot be edited"));
                     navigate("/");
                     return;
                 }
                 if (!data.canEdit) {
-                    alert("You do not have permission to edit this document.");
+                    alert(t("You do not have permission to edit this document."));
                     navigate("/");
                     return;
                 }

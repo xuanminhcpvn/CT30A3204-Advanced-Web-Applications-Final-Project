@@ -50,7 +50,7 @@ router.post("/login", async (req:Request, res:Response) => {
         }
         const user: IUser | null = await User.findOne({ username });
         if (!user) {
-            return res.status(401).json({ message: "user not found" });
+            return res.status(403).json({ message: "user not found" });
         }
         //hash
         const validPassword:boolean = await bcrypt.compare(password, user.password);

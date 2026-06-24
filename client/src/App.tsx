@@ -13,7 +13,7 @@ import i18n from './i18n';
 import { useTranslation } from 'react-i18next';
 function App() { 
   const [theme, setTheme] = useState<"light" | "dark">("light");//Parent owns Navigation state
-  const [language, setLanguage] = useState<"en" | "fi">("en");
+  const [language, setLanguage] = useState<"en" | "fi" | "vi">("en");
   const [jwt, setJwt] = useState<string | null>(null);
   const { t } = useTranslation();
   useEffect(() => {
@@ -54,7 +54,7 @@ function App() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
-    const savedLanguage = localStorage.getItem("language") as "en" | "fi" | null;
+    const savedLanguage = localStorage.getItem("language") as "en" | "fi" | "vi" | null;
     if (savedTheme) {setTheme(savedTheme);}
     if (savedLanguage) {setLanguage(savedLanguage);}
   }, []);

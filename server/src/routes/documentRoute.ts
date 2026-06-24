@@ -205,7 +205,7 @@ router.post("/:id/unlock", validateToken, async (req: CustomRequest, res: Respon
     }
 });
 
-router.get("/:id/lock-info", validateToken, async (req: CustomRequest, res: Response) => {
+router.get("/:id/lodck-info", validateToken, async (req: CustomRequest, res: Response) => {
     try {
         const driveFileId = req.params.id as string;
 
@@ -220,8 +220,7 @@ router.get("/:id/lock-info", validateToken, async (req: CustomRequest, res: Resp
 
         //Lock timeout (10 min) => prevent stale lock
         if (driveFile.currentlyUsedBy && driveFile.lockedAt) {
-
-            const diff:number = Date.now() - new Date(driveFile.lockedAt).getTime();
+            const diff = Date.now() - new Date(driveFile.lockedAt).getTime();
 
             if (diff > 10 * 60 * 1000) {
                 driveFile.currentlyUsedBy = null;

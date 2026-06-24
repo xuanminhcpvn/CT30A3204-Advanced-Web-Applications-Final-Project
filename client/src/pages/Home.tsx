@@ -89,8 +89,8 @@ const Home = () => {
         // Ask user for filename
         const enteredFileName: string | null = prompt("Enter file name:");
         // If user cancels or enters empty name, stop creation
-        if (!enteredFileName || enteredFileName.trim() === "") {
-            alert("File name is required!");
+        if (!enteredFileName) {
+            alert(t("File name cannot be empty!"));
             return;
         }
         try {
@@ -138,10 +138,10 @@ const Home = () => {
 
     // Rename file
     const handleRename = async (fileId: string) => {
-        const newFileName: string | null = prompt("Enter new file name:");
+        const newFileName: string | null = prompt(t("Enter new file name:"));
 
         if (!newFileName) {
-            alert("File name cannot be empty!");
+            alert(t("File name cannot be empty!"));
             return;
         }
 
@@ -163,12 +163,14 @@ const Home = () => {
             fetchFiles();
         } catch (err) {
             console.log("Rename error:", err);
-            alert("Rename failed");
+            alert(t("Rename failed"));
         }
     };
     const handleShare = async (driveFileId: string, shareType: "edit" | "view") => {
-        const email: string | null = prompt(`Enter the email address to grant ${shareType} access:`);
+        const role = shareType === "edit" ? "edit" : "view";        
+         const email: string | null = prompt(t("enterEmailForShare", { role: t(role) }));
         if (!email) {
+            alert(t("Email is required"));
             return;
         }
         try {
@@ -186,8 +188,8 @@ const Home = () => {
                 throw new Error(errorData.message || "Share failed");
             }
             
-            alert(`${shareType === "edit" ? "Editor" : "Viewer"} access granted successfully`);
-
+            alert(t("Access granted successfully", {role: shareType === "edit" ? t("Editor") : t("Viewer")})
+);
     } catch (err) {
         if (err instanceof Error) {
             alert(err.message);
@@ -249,20 +251,15 @@ const Home = () => {
             setUser(normalizedUser);
         } catch (err) {
             console.log(err);
-            alert("Access token expired! Logging out...")
+            alert(t("Access token expired! Logging out..."))
             navigate("login")
         }
     };
 
     const copyLink = (driveFile: IDriveFile) => {
-        if (!driveFile.isPublic) {
-            alert("Make file public first");
-            return;
-        }
-
         const link = `${window.location.origin}/document/public/${driveFile.shareLink}`;
         navigator.clipboard.writeText(link);
-        alert("Link copied!");
+        alert(t("Link copied"));
     };
 
     const formatDate = (dateInput: string) => {
@@ -351,7 +348,7 @@ const Home = () => {
             await fetchMe();
         } catch (err) {
             console.log(err);
-            alert("Image upload failed");
+            alert(t("Image upload failed"));
         } finally {
             setUploadingImage(false);
         }
@@ -360,7 +357,7 @@ const Home = () => {
     const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file: File | undefined= e.target.files?.[0];
         if (!file){
-            alert("No file selected");
+            alert(t("No file selected"));
             return;
         }
         await uploadProfileImage(file);
@@ -369,7 +366,7 @@ const Home = () => {
         const file: File | undefined = e.target.files?.[0];
 
         if (!file) {
-            alert("No file selected");
+            alert(t("No file selected"));
             return;
         }
 
@@ -394,10 +391,10 @@ const Home = () => {
                 throw new Error("Failed to upload image");
             }
             await fetchFiles();
-            alert("Image uploaded successfully");
+            alert(t("Image uploaded successfully"));
         } catch (err) {
             console.log(err);
-            alert("Image upload failed");
+            alert(t("Image upload failed"));
         } finally {
             setUploadingImage(false);
         }
@@ -518,14 +515,14 @@ const Home = () => {
                                     {file.type !== "image" && (<button onClick={() => navigate(`/document/edit/${file._id}`)}>{t("Edit")}</button>)}
                                     <button onClick={() => navigate(`/document/view/${file._id}`)}>{t("View")}</button>
                                     <button onClick={() => handleClone(file._id)} disabled={cloningId === file._id}>{cloningId === file._id ? t("Cloning...") : t("Duplicate")}</button>
-                                    <button onClick={() => handleRename(file._id)}>{t("Rename")}</button>
-                                    {isOwner && (
+                                    {file.isPublic && (<button onClick={() => copyLink(file)}>{t("Copy Public Link")}</button>)}
+                                    {isOwner && (//Only visible to owner => Share, Change visibility, Move to trash, Rename
                                         <>{/*NOTE: image files cannot be shared as editors */}
                                         {file.type !== "image" && (<button onClick={() => handleShare(file._id, "edit")}>{t("Share Edit")}</button>)}
                                             <button onClick={() => handleShare(file._id, "view")}>{t("Share View")}</button>
                                             <button onClick={() =>togglePublic(file._id, file.isPublic)}>{file.isPublic ? t("Make Private"): t("Make Public")}</button>
                                             <button data-testid="cypress-soft-delete-btn" onClick={() => softDelete(file._id)}>{t("Move to Trash")}</button>
-                                            {file.isPublic && (<button onClick={() => copyLink(file)}>{t("Copy Public Link")}</button>)}
+                                            <button onClick={() => handleRename(file._id)}>{t("Rename")}</button>
                                         </>
                                     )}
                                 </div>

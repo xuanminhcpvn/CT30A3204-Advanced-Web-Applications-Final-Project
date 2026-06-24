@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 const Navigation = ({setTheme,theme, setLanguage, language}: {
     setTheme: (mode: "light" | "dark") => void;
     theme: "light" | "dark";
-    setLanguage: (language: "en" | "fi") => void;
-    language: "en" | "fi";
+    setLanguage: (language: "en" | "fi" | "vi") => void;
+    language: "en" | "fi" | "vi";
 }) => {
     const [jwt, setJwt] = useState<string | null>(null);//it will be best to pass this from app.tsx 
     const navigate = useNavigate();
@@ -18,7 +18,7 @@ const Navigation = ({setTheme,theme, setLanguage, language}: {
         }
     }, []);
     
-    const handleLanguageChange = async (language: "en" | "fi") => {
+    const handleLanguageChange = async (language: "en" | "fi" | "vi") => {
         setLanguage(language)
         try {
             await fetch("/api/user/me/settings", {
@@ -71,10 +71,10 @@ const Navigation = ({setTheme,theme, setLanguage, language}: {
         ) : (
             <button onClick={logout}>{t("Logout")}</button>
         )}
-
         <button onClick={() => navigate("/trash")}>{t("Trash")}</button>
         <button onClick={() => handleLanguageChange("fi")}>FI</button>
         <button onClick={() => handleLanguageChange("en")}>EN</button>
+        <button onClick={() => handleLanguageChange("vi")}>VI</button>
         <button onClick={() => handleLightModeChange("light")}>{t("Light")}</button>
         <button onClick={() => handleLightModeChange("dark")}>{t("Dark")}</button>
     </nav>
